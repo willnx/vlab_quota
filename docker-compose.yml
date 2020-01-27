@@ -1,0 +1,24 @@
+version: '3'
+services:
+  quota-api:
+    image:
+      willnx/vlab-quota-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    sysctls:
+      - net.core.somaxconn=500
+  quota-db:
+    image:
+      willnx/vlab-quota-db
+    restart: unless-stopped
+  quota-worker:
+    image:
+      willnx/vlab-quota-worker
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=testing
+      - INF_VCENTER_SERVER=changeMe
+      - INF_VCENTER_USER=changeMe
+      - INF_VCENTER_PASSWORD=changeMe
+      - INF_VCENTER_TOP_LVL_DIR=changeMe
