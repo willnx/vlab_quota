@@ -3,9 +3,11 @@ from flask import Flask
 
 from vlab_quota.libs import const
 from vlab_quota.libs.views import HealthView
+from vlab_quota.libs.views import QuotaView
 
 app = Flask(__name__)
 
+QuotaView.register(app)
 HealthView.register(app)
 
 

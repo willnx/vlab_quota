@@ -24,4 +24,4 @@ images: build
 	docker build -f WorkerDockerfile -t willnx/vlab-quota-worker .
 
 up:
-	docker-compose -p vlabQuota -f docker-compose.yml up --abort-on-container-exit
+	docker-compose -p vlabQuota -f docker-compose.yml -f docker-compose.override.yml up --abort-on-container-exit

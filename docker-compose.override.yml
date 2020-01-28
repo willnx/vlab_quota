@@ -1,0 +1,13 @@
+version: '3'
+services:
+  quota-api:
+    volumes:
+      - ./vlab_quota:/usr/lib/python3.6/site-packages/vlab_quota
+    environment:
+      - DB_PASSWORD='testing'
+  quota-worker:
+    volumes:
+      - ./vlab_quota:/usr/lib/python3.6/site-packages/vlab_quota
+  quota-db:
+    environment:
+      - DB_PASSWORD='testing'
