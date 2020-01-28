@@ -14,7 +14,7 @@ class HealthView(FlaskView):
     """
     Simple end point to test if the service is alive
     """
-    route_base = '/api/1/inf/quota/healthcheck'
+    route_base = '/api/1/quota/healthcheck'
     trailing_slash = False
 
     def get(self):
