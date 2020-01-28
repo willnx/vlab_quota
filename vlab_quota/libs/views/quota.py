@@ -11,7 +11,7 @@ logger = get_logger(__name__, loglevel=const.QUOTA_LOG_LEVEL)
 
 class QuotaView(BaseView):
     """API end point for checking on quota violations"""
-    route_base = '/api/1/inf/quota'
+    route_base = '/api/1/quota'
     GET_SCHEMA = {"$schema": "http://json-schema.org/draft-04/schema#",
                   "description": "Return quota information"
                  }
