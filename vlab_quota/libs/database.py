@@ -7,7 +7,20 @@ from vlab_quota.libs import const
 
 
 class Database:
-    """TODO"""
+    """Abstracts interactions with the Database.
+
+    :param user: The name of the user to login to the database as.
+    :type user: String
+
+    :param password: The ``user`` password
+    :type password: String
+
+    :param database: The name of the database to connect to.
+    :type database: String
+
+    :param host: The IP/FQDN of the database server
+    :type host: String
+    """
     def __init__(self, user=const.DB_USER, password=const.DB_PASSWORD,
                  database=const.DB_DATABASE_NAME, host=const.DB_HOST):
         self.logger = get_logger(__name__, loglevel=const.QUOTA_LOG_LEVEL)
@@ -62,7 +75,17 @@ class Database:
         """
         sql = """SELECT triggered FROM quota_violations WHERE username LIKE (%s);"""
         exceeded_on = self.execute(sql, (username,))
-        self.logger.info(exceeded_on)
         if exceeded_on:
             return exceeded_on[0][0] # because it's a list of tuples, i.e. [(12345,)]
         return 0
+
+
+class DatabaseError(Exception):
+    """Raised when an error occurs when interacting with the database
+
+    :attribute pgcode: The error code used by PostgreSQL. https://www.postgresql.org/docs/9.3/static/errcodes-appendix.html
+    :attribute message: The error message
+    """
+    def __init__(self, message, pgcode):
+        super(DatabaseError, self).__init__(message)
+        self.pgcode = pgcode

@@ -14,6 +14,7 @@ DEFINED = OrderedDict([
             ('DB_PASSWORD', environ.get('DB_PASSWORD', 'testing')),
             ('DB_DATABASE_NAME', environ.get('DB_DATABASE_NAME', 'quota')),
             ('DB_HOST', environ.get('DB_HOST', 'quota-db')),
+            ('VLAB_VERIFY_TOKEN', environ.get('VLAB_VERIFY_TOKEN', False)),
           ])
 
 Constants = namedtuple('Constants', list(DEFINED.keys()))

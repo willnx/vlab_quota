@@ -16,14 +16,14 @@ class QuotaView(BaseView):
                   "description": "Return quota information"
                  }
 
-    @requires(verify=const.VLAB_VERIFY_TOKEN, verison=2)
+    @requires(verify=const.VLAB_VERIFY_TOKEN, version=2)
     @describe(get=GET_SCHEMA)
     def get(self, *args, **kwargs):
         """Obtain quota information"""
         username = kwargs['token']['username']
         with Database() as db:
             exceeded_on = db.user_info(username)
-        resp_data = {'exceeded_on': exceeded_on}
+        resp_data = {'content': {'exceeded_on': exceeded_on}}
         resp = Response(ujson.dumps(resp_data))
         resp.status_code = 200
         resp.headers.add('Link', '<{0}/api/1/inf/inventory>; rel=inventory'.format(const.VLAB_URL))
