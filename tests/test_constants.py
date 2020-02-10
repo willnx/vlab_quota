@@ -20,7 +20,15 @@ class TestConsts(unittest.TestCase):
                     'INF_VCENTER_USER',
                     'QUOTA_LOG_LEVEL',
                     'VLAB_URL',
-                    'VLAB_VERIFY_TOKEN']
+                    'VLAB_VERIFY_TOKEN',
+                    'QUOTA_EMAIL_SSL',
+                    'QUOTA_EMAIL_SSL_VERIFY',
+                    'QUOTA_EMAIL_FROM_DOMAIN',
+                    'QUOTA_EMAIL_SERVER',
+                    'QUOTA_EMAIL_PASSWORD',
+                    'QUOTA_EMAIL_USERNAME',
+                    'QUOTA_EMAIL_BCC',
+                    'VLAB_QUOTA_LIMIT']
 
         # set() avoids false positives due to ordering
         self.assertEqual(set(found), set(expected))

@@ -15,6 +15,14 @@ DEFINED = OrderedDict([
             ('DB_DATABASE_NAME', environ.get('DB_DATABASE_NAME', 'quota')),
             ('DB_HOST', environ.get('DB_HOST', 'quota-db')),
             ('VLAB_VERIFY_TOKEN', environ.get('VLAB_VERIFY_TOKEN', False)),
+            ('VLAB_QUOTA_LIMIT', int(environ.get('VLAB_QUOTA_LIMIT', 30))),
+            ('QUOTA_EMAIL_SERVER', environ.get('QUOTA_EMAIL_SERVER', 'localhost')),
+            ('QUOTA_EMAIL_FROM_DOMAIN', 'noreply@{}'.format(environ.get('QUOTA_EMAIL_FROM_DOMAIN', 'vlab.local'))),
+            ('QUOTA_EMAIL_BCC', environ.get('QUOTA_EMAIL_BCC', '')),
+            ('QUOTA_EMAIL_SSL', environ.get('QUOTA_EMAIL_SSL', False)),
+            ('QUOTA_EMAIL_SSL_VERIFY', environ.get('QUOTA_EMAIL_SSL_VERIFY', False)),
+            ('QUOTA_EMAIL_USERNAME', environ.get('QUOTA_EMAIL_USERNAME', '')),
+            ('QUOTA_EMAIL_PASSWORD', environ.get('QUOTA_EMAIL_PASSWORD', '')),
           ])
 
 Constants = namedtuple('Constants', list(DEFINED.keys()))
