@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 """For sending email notifications to users about quota violations"""
 import ssl
+import time
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -12,7 +13,6 @@ from vlab_api_common.std_logger import get_logger
 from vlab_quota.libs import const
 
 log = get_logger(name=__name__, loglevel=const.QUOTA_LOG_LEVEL)
-
 
 
 class NotifyError(Exception):
@@ -143,6 +143,12 @@ def send_warning(to, vm_count, exp_date):
 
     :param to: The email address of the recipient.
     :type to: String
+
+    :param vm_count: The number of VMs the user owns
+    :type vm_count: Integer
+
+    :param exp_date: The EPOCH timestamp when the grace period expires.
+    :type exp_date: Integer
     """
     body = _generate_warning(vm_count, exp_date)
     mail = _make_email(to, body)
@@ -157,7 +163,50 @@ def send_follow_up(to, the_date, vms):
 
     :param to: The email address of the recipient.
     :type to: String
+
+    :param the_date: The EPOCH timestamp when the VMs were deleted
+    :type the_date: Integer
+
+    :param vms: The VMs deleted
+    :type vms: List
     """
     body = _generate_follow_up(the_date, vms)
     mail = _make_email(to, body)
     _send_email(to, mail)
+
+
+def should_send_warning(violation_date, last_time_notified, grace_period=const.QUOTA_GRACE_PERIOD):
+    """Determine if vLab should send a quota violation warning email.
+
+    To [try and] avoid SPAMMing a user with emails, but send enough to remind them,
+    the approach taken here is to send weekly emails until there's only 3 days
+    left. When the grace period expires within 3 days, send daily emails.
+
+    :Returns: Boolean
+
+    :param violation_date: The EPOCH time when we first noticed the soft-quota had been exceeded.
+    :type violation_date: Integer
+
+    :param last_time_notified: The EPOCH time we last send a user a notification.
+    :type last_time_notified: Integer
+
+    :param grace_period: How long a soft-quota can be exceeded.
+    :type grace_period: Intger
+    """
+    one_week = 604800
+    one_day = 86400
+    three_days = one_day * 3
+    now = int(time.time())
+    notify_delta = now - last_time_notified
+    violation_delta = now - violation_date
+    daily_spam = max(1, grace_period - violation_delta) <= three_days
+
+    send_notification = False
+    if last_time_notified == 0:
+        send_notification = True
+    elif violation_delta >= one_week and notify_delta >= one_week:
+        send_notification = True
+    elif daily_spam and notify_delta >= one_day:
+        send_notification = True
+
+    return send_notification

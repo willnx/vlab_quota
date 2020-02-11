@@ -28,7 +28,8 @@ class TestConsts(unittest.TestCase):
                     'QUOTA_EMAIL_PASSWORD',
                     'QUOTA_EMAIL_USERNAME',
                     'QUOTA_EMAIL_BCC',
-                    'VLAB_QUOTA_LIMIT']
+                    'VLAB_QUOTA_LIMIT',
+                    'QUOTA_GRACE_PERIOD']
 
         # set() avoids false positives due to ordering
         self.assertEqual(set(found), set(expected))

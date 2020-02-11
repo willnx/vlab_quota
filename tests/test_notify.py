@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 """A suite of unit tests for the ``notify.py`` module"""
+import time
 import unittest
 from unittest.mock import patch, MagicMock
 
@@ -257,6 +258,61 @@ class TestSendFollowUp(unittest.TestCase):
         self.assertTrue(fake_generate_follow_up.called)
         self.assertTrue(fake_make_email.called)
         self.assertTrue(fake_send_email.called)
+
+
+class TestShouldSendWarning(unittest.TestCase):
+    """A suite of test cases for the ``should_send_warning`` function"""
+    @classmethod
+    def setUpClass(cls):
+        """Runs once for the whole suite"""
+        cls.one_day = 86400
+        cls.one_week = 604800
+
+    def test_never_notified(self):
+        """``should_send_warning`` returns True if a notification has never been sent"""
+        answer = notify.should_send_warning(violation_date=int(time.time()),
+                                            last_time_notified=0,
+                                            grace_period=self.one_week * 3)
+
+        self.assertTrue(answer)
+
+    def test_has_weeks_told_yesterday(self):
+        """``should_send_warning`` returns False if the user has weeks until the grace period expires
+        and they were notified yesterday.
+        """
+        now = int(time.time())
+        violation = now - self.one_week
+        last_notified = now - self.one_day
+        answer = notify.should_send_warning(violation_date=violation,
+                                            last_time_notified=last_notified,
+                                            grace_period=self.one_week * 3)
+
+        self.assertFalse(answer)
+
+    def test_has_weeks_told_over_a_week_ago(self):
+        """``should_send_warning`` returns True if the user has weeks until the grace period expires
+        and they were notified over a week ago.
+        """
+        now = int(time.time())
+        violation = now - self.one_week
+        last_notified = now - self.one_week
+        answer = notify.should_send_warning(violation_date=violation,
+                                            last_time_notified=last_notified,
+                                            grace_period=self.one_week * 3)
+
+        self.assertTrue(answer)
+
+    def test_into_daily_spam(self):
+        """``should_send_warning`` start sending daily SPAM when the grace period expires in 3 days"""
+        now = int(time.time())
+        violation = now - self.one_week
+        last_notified = now - self.one_day
+        grace_period = self.one_week + self.one_day
+        answer = notify.should_send_warning(violation_date=violation,
+                                            last_time_notified=last_notified,
+                                            grace_period=grace_period)
+
+        self.assertTrue(answer)
 
 
 if __name__ == '__main__':
