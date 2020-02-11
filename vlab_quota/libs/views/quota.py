@@ -22,8 +22,8 @@ class QuotaView(BaseView):
         """Obtain quota information"""
         username = kwargs['token']['username']
         with Database() as db:
-            exceeded_on = db.user_info(username)
-        resp_data = {'content': {'exceeded_on': exceeded_on}}
+            exceeded_on, last_notified = db.user_info(username)
+        resp_data = {'content': {'exceeded_on': exceeded_on, 'last_notified': last_notified}}
         resp = Response(ujson.dumps(resp_data))
         resp.status_code = 200
         resp.headers.add('Link', '<{0}/api/1/inf/inventory>; rel=inventory'.format(const.VLAB_URL))

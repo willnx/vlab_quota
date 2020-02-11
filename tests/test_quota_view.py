@@ -26,13 +26,14 @@ class TestQuotaView(unittest.TestCase):
         cls.app = app.test_client()
 
     @patch.object(quota, 'Database')
-    def test_foo(self, fake_Database):
+    def test_basic(self, fake_Database):
         """QuotaView - GET on /api/1/quota returns the expected JSON response"""
-        fake_Database.return_value.__enter__.return_value.user_info.return_value = 0
+        fake_Database.return_value.__enter__.return_value.user_info.return_value = (1234, 2345)
         resp = self.app.get('/api/1/quota',
                             headers={'X-Auth' : self.token})
-        expected = {'error': None, 'content': { 'exceeded_on': None }, 'params': {}}
+        expected = {'error': None, 'content': {'exceeded_on': 1234, 'last_notified': 2345}, 'params': {}}
 
+        self.assertEqual(resp.json, expected)
 
 
 if __name__ == '__main__':
