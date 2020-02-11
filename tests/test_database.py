@@ -82,16 +82,16 @@ class TestDatabase(unittest.TestCase):
         self.assertTrue(isinstance(result, list))
 
     def test_user_info(self):
-        """``user_info`` returns an integer"""
+        """``user_info`` returns a tuple"""
         fake_fetchall = MagicMock()
-        fake_fetchall.return_value = [(1234,)]
+        fake_fetchall.return_value = [(1234, 5678)]
         db = database.Database()
         db._cursor.fetchall = fake_fetchall
 
-        exceeded_quota_epoch = db.user_info('sally')
-        expected = 1234
+        info = db.user_info('sally')
+        expected = (1234, 5678)
 
-        self.assertEqual(exceeded_quota_epoch, expected)
+        self.assertEqual(info, expected)
 
     def test_user_info_no_violations(self):
         """``user_info`` returns zero when the user has no quota violations"""
@@ -101,7 +101,7 @@ class TestDatabase(unittest.TestCase):
         db._cursor.fetchall = fake_fetchall
 
         exceeded_quota_epoch = db.user_info('sally')
-        expected = 0
+        expected = (0, 0)
 
         self.assertEqual(exceeded_quota_epoch, expected)
 

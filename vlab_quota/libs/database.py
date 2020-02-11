@@ -73,11 +73,11 @@ class Database:
         :param username: The name of the user
         :type username: String
         """
-        sql = """SELECT triggered FROM quota_violations WHERE username LIKE (%s);"""
+        sql = """SELECT triggered, last_notified FROM quota_violations WHERE username LIKE (%s);"""
         exceeded_on = self.execute(sql, (username,))
         if exceeded_on:
-            return exceeded_on[0][0] # because it's a list of tuples, i.e. [(12345,)]
-        return 0
+            return exceeded_on[0] # because it's a list of tuples, i.e. [(12345,)]
+        return (0, 0)
 
 
 class DatabaseError(Exception):
