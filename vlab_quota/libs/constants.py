@@ -6,6 +6,8 @@ from collections import namedtuple, OrderedDict
 
 DEFINED = OrderedDict([
             ('VLAB_URL', environ.get('VLAB_URL', 'https://localhost')),
+            ('VLAB_FQDN', environ.get('VLAB_FQDN', 'vlab.local')),
+            ('VLAB_IP', environ.get('VLAB_IP', socket.gethostbyname(socket.gethostname()))),
             ('QUOTA_LOG_LEVEL', environ.get('QUOTA_LOG_LEVEL', 'INFO')),
             ('INF_VCENTER_SERVER', environ.get('INF_VCENTER_SERVER', 'localhost')),
             ('INF_VCENTER_PORT', int(environ.get('INFO_VCENTER_PORT', 443))),
@@ -25,6 +27,11 @@ DEFINED = OrderedDict([
             ('QUOTA_EMAIL_SSL_VERIFY', environ.get('QUOTA_EMAIL_SSL_VERIFY', False)),
             ('QUOTA_EMAIL_USERNAME', environ.get('QUOTA_EMAIL_USERNAME', '')),
             ('QUOTA_EMAIL_PASSWORD', environ.get('QUOTA_EMAIL_PASSWORD', '')),
+            ('AUTH_TOKEN_VERSION', int(environ.get('AUTH_TOKEN_VERSION', 2))),
+            ('AUTH_PRIVATE_KEY_LOCATION', environ.get('AUTH_PRIVATE_KEY_LOCATION', '/etc/vlab/auth_private.key')),
+            ('AUTH_TOKEN_ALGORITHM', environ.get('AUTH_TOKEN_ALGORITHM', 'HS256')),
+            ('AUTH_BIND_USER', environ.get('AUTH_BIND_USER', 'noone')),
+            ('AUTH_BIND_PASSWORD_LOCATION', environ.get('AUTH_BIND_PASSWORD', '/etc/vlab/ldap_creds.txt')),
           ])
 
 Constants = namedtuple('Constants', list(DEFINED.keys()))
