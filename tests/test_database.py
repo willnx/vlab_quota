@@ -105,6 +105,28 @@ class TestDatabase(unittest.TestCase):
 
         self.assertEqual(exceeded_quota_epoch, expected)
 
+    def test_remove_user(self):
+        """``remove_user`` executes the expected SQL to delete a user"""
+        db = database.Database()
+        db.remove_user('nick')
+
+        the_args, _ = db._cursor.execute.call_args
+        sql = the_args[0]
+        expected_sql = 'DELETE FROM quota_violations WHERE username LIKE (%s)'
+
+        self.assertEqual(sql, expected_sql)
+
+    def test_upsert_user(self):
+        """``upsert_user`` Executes SQL that will create or update a user"""
+        db = database.Database()
+        db.upsert_user('nick', 100, 100)
+
+        the_args, _ = db._cursor.execute.call_args
+        sql = the_args[0]
+        expected_sql = 'INSERT INTO quota_violations (username, triggered, last_notified)\n                 VALUES (%s, %s, %s)\n                 ON CONFLICT (username)\n                 DO UPDATE SET\n                    (triggered, last_notified)\n                    = (EXCLUDED.triggered, EXCLUDED.last_notified);\n        '
+
+        self.assertEqual(sql, expected_sql)
+
 
 if __name__ == '__main__':
     unittest.main()

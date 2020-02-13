@@ -36,7 +36,10 @@ class TestConsts(unittest.TestCase):
                     'AUTH_PRIVATE_KEY_LOCATION',
                     'VLAB_FQDN',
                     'AUTH_BIND_PASSWORD_LOCATION',
-                    'AUTH_BIND_USER',]
+                    'AUTH_BIND_USER',
+                    'INF_VCENTER_TOP_LVL_DIR',
+                    'AUTH_SEARCH_BASE',
+                    'AUTH_LDAP_URL',]
 
         # set() avoids false positives due to ordering
         self.assertEqual(set(found), set(expected))
