@@ -13,6 +13,7 @@ DEFINED = OrderedDict([
             ('INF_VCENTER_PORT', int(environ.get('INFO_VCENTER_PORT', 443))),
             ('INF_VCENTER_USER', environ.get('INF_VCENTER_USER', 'tester')),
             ('INF_VCENTER_PASSWORD', environ.get('INF_VCENTER_PASSWORD', 'a')),
+            ('INF_VCENTER_TOP_LVL_DIR', environ.get('INF_VCENTER_TOP_LVL_DIR', '/vlab')),
             ('DB_USER', environ.get('DB_USER', 'postgres')),
             ('DB_PASSWORD', environ.get('DB_PASSWORD', 'testing')),
             ('DB_DATABASE_NAME', environ.get('DB_DATABASE_NAME', 'quota')),
@@ -32,6 +33,8 @@ DEFINED = OrderedDict([
             ('AUTH_TOKEN_ALGORITHM', environ.get('AUTH_TOKEN_ALGORITHM', 'HS256')),
             ('AUTH_BIND_USER', environ.get('AUTH_BIND_USER', 'noone')),
             ('AUTH_BIND_PASSWORD_LOCATION', environ.get('AUTH_BIND_PASSWORD', '/etc/vlab/ldap_creds.txt')),
+            ('AUTH_SEARCH_BASE', environ.get('AUTH_SEARCH_BASE', 'DC=localhost,DC=local')),
+            ('AUTH_LDAP_URL', environ.get('AUTH_LDAP_URL', 'ldaps://localhost')),
           ])
 
 Constants = namedtuple('Constants', list(DEFINED.keys()))

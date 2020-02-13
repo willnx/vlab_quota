@@ -79,6 +79,41 @@ class Database:
             return exceeded_on[0] # because it's a list of tuples, i.e. [(12345,)]
         return (0, 0)
 
+    def remove_user(self, username):
+        """Remove a user from the violations database
+
+        :Returns: None
+
+        :param username: The name of the user
+        :type username: String
+        """
+        sql = """DELETE FROM quota_violations WHERE username LIKE (%s)"""
+        self.execute(sql, (username,))
+
+    def upsert_user(self, username, violation_date, last_time_notified):
+        """Insert or Update a user in the violations database
+
+        :Returns: None
+
+        :param username: The name of the user
+        :type username: String
+
+        :param violation_date: The EPOCH timestamp when the quota violation occurred
+        :type violation_date: Integer
+
+        :param last_time_notified: The EPOCH timestamp of when the last notification was sent
+        :type last_time_notified: Integer
+        """
+        sql = """INSERT INTO quota_violations (username, triggered, last_notified)
+                 VALUES (%s, %s, %s)
+                 ON CONFLICT (username)
+                 DO UPDATE SET
+                    (triggered, last_notified)
+                    = (EXCLUDED.triggered, EXCLUDED.last_notified);
+        """
+        # The EXCLUDED keyword lets you access the values passed to INSERT
+        self.execute(sql, (username, violation_date, last_time_notified))
+
 
 class DatabaseError(Exception):
     """Raised when an error occurs when interacting with the database
