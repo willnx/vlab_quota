@@ -22,9 +22,9 @@ def _get_violators(vcenter):
     :param vcenter: An object for interacting with the vCenter API.
     :type vcenter: vlab_inf_common.vmaware.vCenter
     """
-    users = vcenter.get_by_name(name=const.INF_VCENTER_TOP_LVL_DIR, vimtype=vim.Folder)
+    users = vcenter.get_vm_folder(path=const.INF_VCENTER_TOP_LVL_DIR)
     vm_quota_limit = const.VLAB_QUOTA_LIMIT + 1 # +1 to account for the defaultGateway
-    return {x.name: len(x.childEntity) for x in users if len(x.childEntity) > vm_quota_limit}
+    return {x.name: len(x.childEntity) for x in users.childEntity if len(x.childEntity) > vm_quota_limit}
 
 
 def _grace_period_exceeded(violation_date):
@@ -62,7 +62,7 @@ def _get_user_email(user, ldap_conn):
         raise RuntimeError('Unable to lookup email for %s', user)
 
 
-def _get_ldap_password(location=const.AUTH_PRIVATE_KEY_LOCATION):
+def _get_ldap_password(location=const.AUTH_BIND_PASSWORD_LOCATION):
     """Reads a file containing some sort of secret/password
 
     :Returns: String
@@ -133,6 +133,7 @@ def main():
     log.info('Quota Grace Period: %s seconds', const.QUOTA_GRACE_PERIOD)
     log.info('vSphere Server: %s', const.INF_VCENTER_SERVER)
     log.info('LDAP Server: %s', const.AUTH_LDAP_URL)
+    log.info('LDAP User: %s', const.AUTH_BIND_USER)
     log.info('SMTP Server: %s', const.QUOTA_EMAIL_SERVER)
     log.info('Loop interval: %s', LOOP_INTERVAL)
     vcenter = vCenter(host=const.INF_VCENTER_SERVER,

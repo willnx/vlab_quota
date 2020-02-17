@@ -25,9 +25,10 @@ class TestGetViolators(unittest.TestCase):
         fake_user3.childEntity = [1,2,3,4]
         cls.fake_user3 = fake_user3
         fake_users = MagicMock()
-        fake_users.__iter__.return_value = [fake_user1, fake_user2, fake_user3]
+        fake_users.childEntity.__iter__.return_value = [fake_user1, fake_user2, fake_user3]
+        cls.fake_users = fake_users
         vcenter = MagicMock()
-        vcenter.get_by_name.return_value = fake_users
+        vcenter.get_vm_folder.return_value = fake_users
         cls.vcenter = vcenter
 
     @patch.object(worker, 'const')

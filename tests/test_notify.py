@@ -64,6 +64,15 @@ class TestGenerateWarning(unittest.TestCase):
 
         self.assertTrue(isinstance(message, str))
 
+    @patch.object(notify, '_get_template_abs')
+    @patch.object(notify, 'open')
+    def test_generate_warning_abs(self, fake_open, fake_get_template_abs):
+        """``_generate_warning`` opens the template file via an absolute file path"""
+        fake_open.return_value.__enter__.return_value.read.return_value = self.TEMPLATE
+        message = notify._generate_warning(9001, 1234)
+
+        self.assertTrue(fake_get_template_abs.called)
+
 
 class TestGenerateFollowUp(unittest.TestCase):
     """A suite of test cases for the ``_generate_follow_up`` function"""
@@ -93,6 +102,15 @@ class TestGenerateFollowUp(unittest.TestCase):
         message = notify._generate_follow_up(1234, ['vmFoo', 'vmBar'])
 
         self.assertTrue(isinstance(message, str))
+
+    @patch.object(notify, '_get_template_abs')
+    @patch.object(notify, 'open')
+    def test_generate_follow_up_html_abs(self, fake_open, fake_get_template_abs):
+        """``_generate_follow_up`` opens the template file via an absolute file path"""
+        fake_open.return_value.__enter__.return_value.read.return_value = self.TEMPLATE
+        message = notify._generate_follow_up(1234, ['vmFoo', 'vmBar'])
+
+        self.assertTrue(fake_get_template_abs.called)
 
 
 class TestMakeEmail(unittest.TestCase):

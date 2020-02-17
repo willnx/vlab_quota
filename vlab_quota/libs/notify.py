@@ -3,6 +3,7 @@
 import ssl
 import time
 import smtplib
+import os.path
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timezone
@@ -35,6 +36,17 @@ def _get_ssl_context():
     return context
 
 
+def _get_template_abs(template):
+    """Avoids issues where a current-working dir is not the same as this module.
+
+    :Returns: String
+
+    :param template: The name of the jinja2 templates
+    :type template: String
+    """
+    return os.path.join(os.path.dirname(__file__), template)
+
+
 def _generate_warning(vm_count, exp_date, template='violation_warning.html'):
     """Create the HTML email body to warn users about a quota violation.
 
@@ -46,7 +58,7 @@ def _generate_warning(vm_count, exp_date, template='violation_warning.html'):
     :param exp_date: When the soft quota grace period will expire (EPOCH).
     :type exp_date: Integer
     """
-    with open(template) as the_file:
+    with open(_get_template_abs(template)) as the_file:
         template_data = the_file.read()
     vm_delta = vm_count - const.VLAB_QUOTA_LIMIT
     message = jinja2.Template(template_data).render(vm_quota=const.VLAB_QUOTA_LIMIT,
@@ -67,7 +79,7 @@ def _generate_follow_up(the_date, vms, template='delete_followup.html'):
     :param vms: The names of the VM(s) deleted.
     :type vms: List
     """
-    with open(template) as the_file:
+    with open(_get_template_abs(template)) as the_file:
         template_data = the_file.read()
     message = jinja2.Template(template_data).render(the_date=datetime.fromtimestamp(the_date, timezone.utc),
                                                     vms=vms)
