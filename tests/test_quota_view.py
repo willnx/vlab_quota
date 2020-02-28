@@ -31,7 +31,14 @@ class TestQuotaView(unittest.TestCase):
         fake_Database.return_value.__enter__.return_value.user_info.return_value = (1234, 2345)
         resp = self.app.get('/api/1/quota',
                             headers={'X-Auth' : self.token})
-        expected = {'error': None, 'content': {'exceeded_on': 1234, 'last_notified': 2345}, 'params': {}}
+        expected = {'error': None,
+                    'content': {
+                        'exceeded_on': 1234,
+                        'last_notified': 2345,
+                        'grace_period': quota.const.QUOTA_GRACE_PERIOD,
+                        'soft-limit': quota.const.VLAB_QUOTA_LIMIT,
+                        },
+                    'params': {}}
 
         self.assertEqual(resp.json, expected)
 
