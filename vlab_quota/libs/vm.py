@@ -160,7 +160,7 @@ def destroy_vms(user, vcenter):
     deleted_vms = []
     while len(user_vms) > const.VLAB_QUOTA_LIMIT:
         unlucky_vm = random.sample(user_vms, 1)[0] # b/c random.sample returns a list
-        vm_info = virtual_machine.get_info(unlucky_vm)
+        vm_info = virtual_machine.get_info(vcenter, unlucky_vm, user)
         vm_name = unlucky_vm.name
         if vm_info['meta']['component'] == 'Unknown':
             log.info("Skipping VM %s owned by %s: VM cannot be deleted at this time", vm_name, user)
