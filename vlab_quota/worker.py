@@ -24,7 +24,8 @@ def _get_violators(vcenter):
     """
     users = vcenter.get_vm_folder(path=const.INF_VCENTER_TOP_LVL_DIR)
     vm_quota_limit = const.VLAB_QUOTA_LIMIT + 1 # +1 to account for the defaultGateway
-    return {x.name: len(x.childEntity) for x in users.childEntity if len(x.childEntity) > vm_quota_limit}
+    # len(x.childEntity) -1 to account for the defaultGateway "down/up the stack"
+    return {x.name: len(x.childEntity) -1 for x in users.childEntity if len(x.childEntity) > vm_quota_limit}
 
 
 def _grace_period_exceeded(violation_date):
@@ -95,7 +96,9 @@ def _get_ldap_conn():
 def _enforce_quotas(vcenter, db, ldap_conn):
     """Main business logic for enforcing soft-quotas
 
-    :Returns: None
+    Returns a set of users with a quota violation
+
+    :Returns: Set
 
     :param vcenter: An object for interacting with the vCenter API.
     :type vcenter: vlab_inf_common.vmaware.vCenter
@@ -127,6 +130,25 @@ def _enforce_quotas(vcenter, db, ldap_conn):
             notify.send_warning(user_email, vm_count, exp_date)
             last_time_notified = now
             db.upsert_user(violator, violation_date, last_time_notified)
+    return set(violators.keys())
+
+
+def _cleanup_reconciled_users(current_users_in_violation, users_in_violation, db):
+    """Remove the quota violation record if a user deleted VMs and is no longer
+    violating the quota limit.
+
+    :param current_users_in_violation: The most recent group of users that exceeded the quota limit
+    :type current_users_in_violation: Set
+
+    :param users_in_violation: The last group of users that exceeded the quota limit
+    :type users_in_violation: Set
+
+    :param db: An established connection to the Quota database.
+    :type db: vlab_quotas.libs.database.Database
+    """
+    reconciled_users = [x for x in users_in_violation if x not in current_users_in_violation]
+    for user in reconciled_users:
+        db.remove_user(user)
 
 
 def main():
@@ -146,9 +168,12 @@ def main():
     atexit.register(db.close)
     ldap_conn = _get_ldap_conn()
     atexit.register(ldap_conn.unbind)
+    users_in_violation = set()
     while True:
         start_loop = int(time.time())
-        _enforce_quotas(vcenter, db, ldap_conn)
+        current_users_in_violation = _enforce_quotas(vcenter, db, ldap_conn)
+        _cleanup_reconciled_users(current_users_in_violation, users_in_violation, db)
+        users_in_violation = current_users_in_violation
         loop_ran_for = max(0, int(time.time()) - start_loop)
         sleep_delta = max(0, (LOOP_INTERVAL - loop_ran_for))
         time.sleep(sleep_delta)

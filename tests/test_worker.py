@@ -36,7 +36,7 @@ class TestGetViolators(unittest.TestCase):
         """``_get_violators`` returns a dictionary of username to VM count for users exceeding the quota limit"""
         fake_const.VLAB_QUOTA_LIMIT = 2
         violators = worker._get_violators(self.vcenter)
-        expected = {'bill': 4, 'lisa': 4, 'zed': 4}
+        expected = {'bill': 3, 'lisa': 3, 'zed': 3}
 
         self.assertEqual(violators, expected)
 
@@ -212,6 +212,31 @@ class TestEnforceQuotas(unittest.TestCase):
         expected = 9001
 
         self.assertEqual(violation_date, expected)
+
+
+class TestCleanupReconciledUsers(unittest.TestCase):
+    """A suite of test cases for the ``_cleanup_reconciled_users`` function"""
+    def test_initial_state(self):
+        """``_cleanup_reconciled_users`` Makes no DB calls when no previous violators exist"""
+        fake_db = MagicMock()
+        current_users_in_violation = {'bob', 'jill'}
+        users_in_violation = set()
+        worker._cleanup_reconciled_users(current_users_in_violation, users_in_violation, fake_db)
+
+        self.assertFalse(fake_db.remove_user.called)
+
+    def test_good_user(self):
+        """``_cleanup_reconciled_users`` Makes no DB calls when no previous violators exist"""
+        fake_db = MagicMock()
+        current_users_in_violation = {'bob'}
+        users_in_violation = {'bob', 'jill'}
+        worker._cleanup_reconciled_users(current_users_in_violation, users_in_violation, fake_db)
+
+        the_args, _ = fake_db.remove_user.call_args
+        removed_user = the_args[0]
+        expected = 'jill'
+
+        self.assertEqual(removed_user, expected)
 
 
 @patch.object(worker, '_enforce_quotas')

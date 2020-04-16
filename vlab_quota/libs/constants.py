@@ -4,10 +4,18 @@ from os import environ
 from collections import namedtuple, OrderedDict
 
 
+def _ip_source():
+    ipv4_addr = socket.gethostbyname(socket.gethostname())
+    bits = ipv4_addr.split('.')
+    bits[-1] = '1'
+    return '.'.join(bits)
+
+
 DEFINED = OrderedDict([
             ('VLAB_URL', environ.get('VLAB_URL', 'https://localhost')),
             ('VLAB_FQDN', environ.get('VLAB_FQDN', 'vlab.local')),
-            ('VLAB_IP', environ.get('VLAB_IP', socket.gethostbyname(socket.gethostname()))),
+            ('VLAB_LOCAL_IP', _ip_source()),
+            ('VLAB_SERVER_IP', environ.get('VLAB_SERVER_IP', socket.gethostbyname(socket.gethostname()))),
             ('QUOTA_LOG_LEVEL', environ.get('QUOTA_LOG_LEVEL', 'INFO')),
             ('INF_VCENTER_SERVER', environ.get('INF_VCENTER_SERVER', 'localhost')),
             ('INF_VCENTER_PORT', int(environ.get('INFO_VCENTER_PORT', 443))),

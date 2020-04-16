@@ -40,7 +40,6 @@ def _call_api(url, token, method='get', payload=None, task_call=True):
     """
     headers = {'User-Agent': 'vLab Quota',
                'X-Auth': token,
-               'X-Forwarded-For': const.VLAB_IP,
                'X-REQUEST-ID' : uuid.uuid4().hex}
     caller = getattr(requests, method.lower())
     resp = caller(url, headers=headers, json=payload, verify=False)
@@ -75,7 +74,7 @@ def _get_secret(location=const.AUTH_PRIVATE_KEY_LOCATION):
     return secret
 
 
-def _generate_token(user, version=const.AUTH_TOKEN_VERSION, client_ip=const.VLAB_IP):
+def _generate_token(user, version=const.AUTH_TOKEN_VERSION, client_ip=const.VLAB_SERVER_IP):
     """Create an auth token
 
     :Returns: String
@@ -116,7 +115,7 @@ def _delete_vm(user, vm_name, vm_type):
     :type vm_type: String
     """
     vm_url = 'https://{}/api/2/inf/{}'.format(const.VLAB_FQDN, vm_type.lower())
-    token = _generate_token(user)
+    token = _generate_token(user, client_ip=const.VLAB_LOCAL_IP)
     payload = {'name': vm_name}
     _call_api(vm_url, token, method='DELETE', payload=payload, task_call=True)
 
