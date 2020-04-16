@@ -35,6 +35,8 @@ def _grace_period_exceeded(violation_date):
     :param violation_date: The EPOCH timestamp when the user exceeded their VM quota.
     :type violation_date: Integer
     """
+    if violation_date is 0:
+        return False
     return int(time.time()) > (violation_date + const.QUOTA_GRACE_PERIOD)
 
 
